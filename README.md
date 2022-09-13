@@ -1,3 +1,7 @@
 # Проектная работа 10 спринта
 
-Проектные работы в этом модуле в команде. Задания на спринт вы найдёте внутри тем.
+
+[Репозиторий notifications_sprint_1 (проектная работа 10-го спринта)](https://github.com/NataliaLaktyushkina/notifications_sprint_1)
+
+### CI / CD ###
+[Workflow](.github/workflows/python.yml)
