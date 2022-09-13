@@ -78,5 +78,3 @@ jobs:
             Python v ${{matrix.version}}
             Actor: ${{ github.actor }}.
             Message: ${{ github.event.commits[0].message }}
-
-
