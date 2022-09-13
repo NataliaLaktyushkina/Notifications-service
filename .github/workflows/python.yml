@@ -57,7 +57,7 @@ jobs:
           to: ${{ secrets.TG_CHAT_ID }}
           token: ${{ secrets.TG_BOT_KEY }}
           message: |
-            ${{ github.repository }}: Pipeline for ${{ GITHUB_SHA}} finished with error!
+            ${{ github.repository }}: Pipeline for ${{ github.sha }} finished with error!
             if (${{ steps.set_up_python.outcome.failure }}; then "set_up_python failed"; fi;
             if ${{ steps.dependencies.outcome.failure }}; then "dependencies failed"; fi;
             if ${{ steps.linter.outcome.failure }}; then "linter failed"; fi;
@@ -75,7 +75,7 @@ jobs:
           to: ${{ secrets.TG_CHAT_ID }}
           token: ${{ secrets.TG_BOT_KEY }}
           message: |
-            ${{ github.repository }}: Pipeline for ${{ GITHUB_SHA }} finished successfully
+            ${{ github.repository }}: Pipeline for ${{ github.sha }} finished successfully
 
             Python v ${{matrix.version}}
             Actor: ${{ github.actor }}.
