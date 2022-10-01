@@ -3,16 +3,17 @@
 from fastapi import APIRouter, Depends
 from models.notifications import NotificationSent
 from services.jwt_check import JWTBearer
+from services.users import get_db, QueueHandler
 
 router = APIRouter()
 
 
 @router.post('/', description='New user',
-            response_description='User registration',
-            )
+             response_description='User registration',
+             )
 async def user_registration(
         user_id: str = Depends(JWTBearer()),
+        service: QueueHandler = Depends(get_db),
 ) -> NotificationSent:
     """Send welcome letter to user."""
-    pass
-    # return await service.sent_notification(user_id=user_id)
+    return await service.send_notification(user_id=user_id)

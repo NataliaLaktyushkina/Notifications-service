@@ -1,18 +1,19 @@
 from fastapi import Depends
-from services.service_bookmark import AbstractQueue, QueueRabbit
+from services.queue import AbstractQueue, QueueRabbit
 from models.notifications import NotificationSent
+from db.queue_rabbit import get_connection
 
 
 class QueueHandler:
     def __init__(self, queue: AbstractQueue):
         self.queue = queue
 
-    async def publish(self, movie_id: str, user_id: str) -> NotificationSent:
-        bookmark_added = await self.bookmark_db.add_bookmark(movie_id, user_id)
-        return BookmarkAdded(added=bookmark_added)
+    async def send_notification(self, user_id: str) -> NotificationSent:
+        notification_sent = await self.queue.send_msg(user_id)
+        return notification_sent
 
 
 def get_db(
-        RabbitMQ: AbstractQueue = Depends(get_rabbit),
-) -> RabbitHandler:
-    return QueueHandler(QueueRabbit(RabbitMQ))
+        rabbitmq: AbstractQueue = Depends(get_connection),
+) -> QueueHandler:
+    return QueueHandler(QueueRabbit(rabbitmq))

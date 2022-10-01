@@ -7,6 +7,7 @@ from fastapi.responses import ORJSONResponse
 
 from api.v1 import users
 from core.config import settings
+from db import queue_rabbit
 from services.jwt_check import JWTBearer
 
 app = FastAPI(
@@ -22,7 +23,7 @@ PROTECTED = [Depends(JWTBearer)]  # noqa: WPS407
 @app.on_event('startup')
 async def startup() -> None:
     """Start up settings - connect to RabbitMQ"""
-    global connection
+    # global connection
 
     rabbitmq_settings = settings.rabbitmq_settings
 
@@ -35,39 +36,20 @@ async def startup() -> None:
         port=rabbitmq_settings.RABBITMQ_PORT,
         credentials=credentials,
         heartbeat=600,
-        blocked_connection_timeout=300
+        blocked_connection_timeout=300,
     )
 
     @backoff.on_exception(backoff.expo, pika.exceptions.AMQPConnectionError)
     def _connect():
         return pika.BlockingConnection(parameters=parameters)
 
-    connection = _connect()
-    channel = connection.channel()
-    # the producer can only send messages to an exchange.
-    # An exchange on one side receives messages from producers
-    # and the other side it pushes them to queues.
-    # The exchange must know exactly what to do with a message it receives.
-    channel.exchange_declare(
-        exchange=rabbitmq_settings.RABBITMQ_EXCHANGE,
-        exchange_type=rabbitmq_settings.RABBITMQ_EXCHANGE_TYPE,
-        durable=True,
-    )
-    channel.queue_declare(queue=rabbitmq_settings.RABBITMQ_QUEUE_NAME, durable=True)
+    queue_rabbit.connection = _connect()
 
 
 @app.on_event('shutdown')
 async def shutdown() -> None:
     """Shut down settings - disconnect from RabbitMQ"""
-    connection.close()
-
-
-# @app.middleware("http")
-# async def before_request(request: Request, call_next):  # type: ignore
-#     request_id = request.headers.get('X-Request-Id')
-#     if not request_id:
-#         raise RuntimeError('request id is required')
-#     return await call_next(request)
+    queue_rabbit.connection.close()
 
 
 app.include_router(
