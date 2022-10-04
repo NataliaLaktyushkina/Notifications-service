@@ -15,9 +15,14 @@ class EmailSettings(BaseSettings):
     EMAIL_PASS: Optional[str]
 
 
+class SMTPSettings(BaseSettings):
+    SMTP_HOST: Optional[str]
+    SMTP_PORT: Optional[str]
+
 class Settings(BaseSettings):
 
     email_settings: EmailSettings = EmailSettings()
+    smtp_settings: SMTPSettings = SMTPSettings()
 
     class Config:
         env_file = '.env'
