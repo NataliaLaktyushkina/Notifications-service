@@ -29,8 +29,8 @@ class FastAPISettings(BaseSettings):
 class RabbitMQUser(BaseSettings):
     """RabbitMQ username and password"""
 
-    RABBITMQ_USER: Optional[str] = os.getenv("RABBITMQ_DEFAULT_USER")
-    RABBITMQ_PASS: Optional[str] = os.getenv("RABBITMQ_DEFAULT_PASS")  # noqa: WPS115
+    RABBITMQ_USER: Optional[str] = os.getenv('RABBITMQ_DEFAULT_USER')
+    RABBITMQ_PASS: Optional[str] = os.getenv('RABBITMQ_DEFAULT_PASS')  # noqa: WPS115
 
     RABBITMQ_EXCHANGE: Optional[str]
     RABBITMQ_EXCHANGE_TYPE: Optional[str]

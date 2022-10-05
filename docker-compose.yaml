@@ -25,19 +25,16 @@ services:
     build:
       context: fast_api
     image: fast_api
-    ports:
-      - "8101:8101"
 
-#
-#  nginx:
-#    container_name: nginx
-#    build:
-#      context: ./nginx
-#    ports:
-#      - "80:80"
-#    depends_on:
-#      - fast_api
-#
+  nginx:
+    container_name: nginx
+    build:
+      context: ./nginx
+    ports:
+      - "80:80"
+    depends_on:
+      - fast_api
+
 
 
 networks:
