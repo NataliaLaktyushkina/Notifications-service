@@ -13,8 +13,8 @@ if not IS_DOCKER:
 class RabbitMQUser(BaseSettings):
     """RabbitMQ username and password"""
 
-    RABBITMQ_USER: Optional[str] = os.getenv("RABBITMQ_DEFAULT_USER")
-    RABBITMQ_PASS: Optional[str] = os.getenv("RABBITMQ_DEFAULT_PASS")  # noqa: WPS115
+    RABBITMQ_USER: Optional[str] = os.getenv('RABBITMQ_DEFAULT_USER')
+    RABBITMQ_PASS: Optional[str] = os.getenv('RABBITMQ_DEFAULT_PASS')  # noqa: WPS115
 
     RABBITMQ_EXCHANGE: Optional[str]
     RABBITMQ_EXCHANGE_TYPE: Optional[str]
@@ -58,4 +58,4 @@ def get_settings() -> Union[PromSettings, DevSettings]:
     return DevSettings()
 
 
-settings = get_settings()
+rabbit_settings = get_settings()

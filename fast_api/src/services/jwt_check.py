@@ -16,19 +16,19 @@ class JWTBearer(HTTPBearer):
     async def __call__(self, request: Request) -> Union[list[str], Optional[Any]]:  # type: ignore
         credentials: HTTPAuthorizationCredentials = await super(JWTBearer, self).__call__(request=request)
         if credentials:
-            if not credentials.scheme == "Bearer":
-                raise HTTPException(status_code=http.HTTPStatus.FORBIDDEN, detail="Invalid authentication scheme.")
+            if not credentials.scheme == 'Bearer':
+                raise HTTPException(status_code=http.HTTPStatus.FORBIDDEN, detail='Invalid authentication scheme.')
             if not self.verify_jwt(jwtoken=credentials.credentials):
-                raise HTTPException(status_code=http.HTTPStatus.FORBIDDEN, detail="Invalid token or expired token.")
-            return jwt_decoder(token=credentials.credentials).get("user_id")
+                raise HTTPException(status_code=http.HTTPStatus.FORBIDDEN, detail='Invalid token or expired token.')
+            return jwt_decoder(token=credentials.credentials).get('user_id')
 
-        raise HTTPException(status_code=http.HTTPStatus.FORBIDDEN, detail="Invalid authorization code.")
+        raise HTTPException(status_code=http.HTTPStatus.FORBIDDEN, detail='Invalid authorization code.')
 
     @staticmethod
     def verify_jwt(jwtoken: str) -> bool:
         try:
             payload: dict = jwt_decoder(jwtoken)
-            expire_time: int = payload.get("exp")  # type: ignore
+            expire_time: int = payload.get('exp')  # type: ignore
             current_time: int = int(datetime.now().timestamp())
         except InvalidTokenError:
             return False
