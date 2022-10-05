@@ -20,14 +20,15 @@ services:
       timeout: 15s
       retries: 1
 
-#  fast_api:
-#    container_name: fast_api
-#    build:
-#      context: fast_api
-#    image: fast_api
-#    environment:
-#      PYTHONUNBUFFERED: 1
+  fast_api:
+    container_name: fast_api
+    build:
+      context: fast_api
+    image: fast_api
+    ports:
+      - "8101:8101"
 
+#
 #  nginx:
 #    container_name: nginx
 #    build:
@@ -36,9 +37,9 @@ services:
 #      - "80:80"
 #    depends_on:
 #      - fast_api
-
+#
 
 
 networks:
    default:
-     name: ugc_network
+     name: notifications_network
