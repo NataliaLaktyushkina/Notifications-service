@@ -1,12 +1,20 @@
-import pika
-from settings.rabbitmq import config
+import logging
+import os
+import sys
 
-rabbitmq_settings = config.settings.rabbitmq_settings
+import pika
+
+sys.path.append(os.path.dirname(__file__) + '/..')
+
+from settings.rabbitmq.config import rabbit_settings  # noqa: E402
+
+rabbitmq_settings = rabbit_settings.rabbitmq_settings
+logger = logging.getLogger(__name__)
 
 
 class Handler:
 
-    def __init__(self):
+    def __init__(self) -> None:
 
         credentials = pika.PlainCredentials(
             rabbitmq_settings.RABBITMQ_USER,
@@ -21,17 +29,27 @@ class Handler:
             blocked_connection_timeout=300,
         )
 
-    def get_msg(self, queue):
+    def get_msg(self, queue: str) -> None:
+        logger.info(self.parameters.host)
         connection = pika.BlockingConnection(parameters=self.parameters)
         channel = connection.channel()
-        method_frame, header_frame, body = channel.basic_get(queue)
-        if method_frame:
-            print(method_frame, header_frame, body)
-            channel.basic_ack(method_frame.delivery_tag)
-        else:
-            print('No message returned')
+        # нужно, чтобы быть уверенным в существовании очереди
+        channel.queue_declare(queue=queue, durable=True)
+
+        def callback(ch, method, properties, body):  # type: ignore
+            logger.info(body)
+
+        channel.basic_consume(queue=queue,
+                              auto_ack=True,
+                              on_message_callback=callback)
+
+        channel.start_consuming()
+
+
+def main(queue: str = 'registration') -> None:
+    handler = Handler()
+    handler.get_msg(queue)
 
 
 if __name__ == '__main__':
-    handler = Handler()
-    handler.get_msg('registration')
+    main()

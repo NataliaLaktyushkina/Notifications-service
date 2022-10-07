@@ -40,7 +40,7 @@ async def startup() -> None:
     )
 
     @backoff.on_exception(backoff.expo, pika.exceptions.AMQPConnectionError)
-    def _connect():
+    def _connect() -> pika.BlockingConnection:
         return pika.BlockingConnection(parameters=parameters)
 
     queue_rabbit.connection = _connect()
@@ -49,7 +49,7 @@ async def startup() -> None:
 @app.on_event('shutdown')
 async def shutdown() -> None:
     """Shut down settings - disconnect from RabbitMQ"""
-    queue_rabbit.connection.close()
+    queue_rabbit.connection.close()  # type: ignore
 
 
 app.include_router(
@@ -63,3 +63,4 @@ if __name__ == '__main__':
         host='0.0.0.0',
         port=8101,
     )
+#

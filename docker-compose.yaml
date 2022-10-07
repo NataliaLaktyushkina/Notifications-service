@@ -26,6 +26,14 @@ services:
       context: fast_api
     image: fast_api
 
+
+  consumer:
+    container_name: consumer
+    build:
+      context: workers
+    depends_on:
+      - rabbit_mq
+
   nginx:
     container_name: nginx
     build:
