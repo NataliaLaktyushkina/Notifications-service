@@ -36,18 +36,20 @@ jobs:
 
     - id: linter
       name: Lint with styleguide
+      if: ${{ always() }}
       run: |
         flake8 . --config=flake8.cfg
 
         # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
         flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
-      continue-on-error: true
+#      continue-on-error: true
 
     - id: mypy
       name: Mypy
+      if: ${{ always() }}
       run: |
         mypy . --config=mypy.cfg
-      continue-on-error: true
+#      continue-on-error: true
 
     - name: send telegram message
       id: error_msg
@@ -58,10 +60,10 @@ jobs:
           token: ${{ secrets.TG_BOT_KEY }}
           message: |
             ${{ github.repository }}: Pipeline for ${{ github.sha }} finished with error!
-            if (${{ steps.set_up_python.outcome.failure }}; then "set_up_python failed"; fi;
-            if ${{ steps.dependencies.outcome.failure }}; then "dependencies failed"; fi;
-            if ${{ steps.linter.outcome.failure }}; then "linter failed"; fi;
-            if ${{ steps.mypy.outcome.failure }}; then "mypy failed"; fi;
+            if: ${{ steps.set_up_python.outcome.failure }}; then "set_up_python failed"; fi;
+            if: ${{ steps.dependencies.outcome.failure }}; then "dependencies failed"; fi;
+            if: ${{ steps.linter.outcome.failure }}; then "linter failed"; fi;
+            if: ${{ steps.mypy.outcome.failure }}; then "mypy failed"; fi;
 
             Python v ${{matrix.version}}
             Actor: ${{ github.actor }}.

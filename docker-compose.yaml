@@ -1,0 +1,50 @@
+version: '3'
+
+services:
+  rabbit_mq:
+    image: rabbitmq:3.10.7-management-alpine
+    container_name: rabbit_mq
+    ports:
+      - "5672:5672" #amqp
+      - "15672:15672" #http
+    volumes:
+      - ~/.docker-conf/rabbitmq/data/:/var/lib/rabbitmq/
+      - ~/.docker-conf/rabbitmq/log/:/var/log/rabbitmq
+    environment:
+      RABBITMQ_DEFAULT_VHOST: ${RABBITMQ_VHOST}
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_DEFAULT_USER}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_DEFAULT_PASS}
+    healthcheck:
+      test: [ "CMD", "nc", "-z", "localhost", "5672" ]
+      interval: 5s
+      timeout: 15s
+      retries: 1
+
+  fast_api:
+    container_name: fast_api
+    build:
+      context: fast_api
+    image: fast_api
+
+
+  consumer:
+    container_name: consumer
+    build:
+      context: workers
+    depends_on:
+      - rabbit_mq
+
+  nginx:
+    container_name: nginx
+    build:
+      context: ./nginx
+    ports:
+      - "80:80"
+    depends_on:
+      - fast_api
+
+
+
+networks:
+   default:
+     name: notifications_network
