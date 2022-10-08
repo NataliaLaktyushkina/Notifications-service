@@ -48,15 +48,15 @@ class EmailSender:
         self.server.close()
 
 
-def main() -> None:
+def main(text: str) -> None:
     email_sender = EmailSender()
     email_sender.add_header(receivers=['education_tests@mail.ru'],
                             msg_subject='A letter from me!')
     email_sender.add_template(template_name='mail.html',
                               title='This is title',
-                              text='Looong text')
+                              text=text)
     email_sender.send_msg(receivers=['education_tests@mail.ru'])
 
 
 if __name__ == '__main__':
-    main()
+    main(text='Looong text')

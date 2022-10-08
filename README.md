@@ -11,6 +11,29 @@
 
 `docker compose up`
 
+Шаблоны для отправки писем хранятся в MongoDB в формате:
+DB - ugc_db
+collection - bookmarks
+documents = {user_id: [movie_id_1, movie_id_2]}
+
+**Запуск API & Consumers:**
+
+`docker compose up` из корня проекта
+
+**Переменные окружения**
+
+[Docker RabbitMQ](/.env.example)
+
+API:
+
+[Fast API](/fast_api/src/core/.env.example)
+
+Workers:
+
+[email](/workers/src/settings/email/.env.example)
+
+[rabbitmq](/workers/src/settings/rabbitmq/.env.example)
+
 ###API для приёма событий по созданию уведомлений: ###
 Принимает события от планировщика и сервисов, генерирующих события (UGC, Auth), кладет их в RabbitMQ.
 
