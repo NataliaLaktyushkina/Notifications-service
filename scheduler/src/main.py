@@ -4,21 +4,40 @@ from core.config import settings
 import uuid
 from random import randint
 
-NUMBER_EVENTS = settings.NUMBER_EVENTS
+USERS_NUMBER = settings.USERS_NUMBER
+MOVIES_NUMBER = settings.MOVIES_NUMBER
 
 
 def get_payload_likes() -> dict:
-    user_id = uuid.uuid4()
-    movie_id = uuid.uuid4()
-    n_likes = randint(1, 10)  # noqa: S311
-    payload = {'user':
-                   {'user_id': user_id },
-               'content': [
-                   {'movie_id': movie_id,
-                    'likes': n_likes,
-                    },
-               ],
-               }
+    # Для каждого пользователя свой список фильмов и рецензий к ним
+    # payload - {users:
+    #               [{user : {user_id : user_id_1},
+    #                 content: {movie: n, movie_2: n2}   # noqa: E800
+    #                   },
+
+    #                {user: {user_id: user_id_2},
+    #                  content: {movie: n, movie_2: n2}   # noqa: E800
+    #                   }   # noqa: E800
+    #               ]}   # noqa: E800
+    users_list = []
+
+    for _i in range(USERS_NUMBER):
+
+        user_id = uuid.uuid4()
+        content = []
+        for _j in range(randint(1,MOVIES_NUMBER)):  # noqa: S311
+            movie_id = uuid.uuid4()
+            n_likes = randint(1, 10)  # noqa: S311
+            content.append(
+                {'movie_id': movie_id,
+                 'likes': n_likes,
+                 },
+             )
+        users_list.append({'user':
+                       {'user_id': user_id },
+                   'content': content,
+                   })
+    payload = {'users': users_list}
     return payload
 
 
@@ -34,13 +53,10 @@ def generate_event() -> Event:
                  )
 
 
-def main() -> list:
-    events_list = []
-    for _i in range(NUMBER_EVENTS):
-        event = generate_event()
-        events_list.append(event)
-    print(events_list)
-    return events_list
+def main() -> None:
+    event = generate_event()
+    print(event)
+    # put_events_to_queue(events_list)   # noqa: E800
 
 
 if __name__ == '__main__':

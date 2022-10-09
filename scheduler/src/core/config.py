@@ -35,10 +35,10 @@ class RabbitMQSettingsDev(RabbitMQUser):
     RABBITMQ_PORT: Optional[str] = os.getenv('RABBITMQ_PORT_DEBUG')  # noqa: WPS115
 
 
-
 class Settings(BaseSettings):
 
-    NUMBER_EVENTS: int = 0
+    USERS_NUMBER: int = 0
+    MOVIES_NUMBER: int = 0
 
     class Config:
         env_file = '.env'
