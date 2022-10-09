@@ -48,7 +48,7 @@ jobs:
       name: Mypy
       if: ${{ always() }}
       run: |
-        mypy . --config=mypy.cfg
+        mypy . --config=mypy.cfg --explicit-package-bases
 #      continue-on-error: true
 
     - name: send telegram message
