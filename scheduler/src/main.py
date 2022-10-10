@@ -7,7 +7,7 @@ import backoff
 import pika
 
 from core.config import settings
-from fast_api.src.db import queue_rabbit
+from db import queue_rabbit
 from schedul_models.events import Event, Source, EventType, EventSent
 from schedul_services.events import QueueHandler
 from schedul_services.scheduler_queue import QueueRabbit

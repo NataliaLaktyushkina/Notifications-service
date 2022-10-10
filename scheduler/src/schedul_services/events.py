@@ -1,7 +1,7 @@
 from schedul_models.events import Event, EventSent
 from schedul_services.scheduler_queue import  AbstractQueue, QueueRabbit
 from fastapi import Depends
-from fast_api.src.db.queue_rabbit import get_connection
+from db.queue_rabbit import get_connection
 
 
 class QueueHandler:
