@@ -23,3 +23,7 @@ class Event(BaseModel):
     event_type: EventType
     scheduled_datetime: datetime
     payload: Dict
+
+
+class EventSent(BaseModel):
+    event_sent: bool
