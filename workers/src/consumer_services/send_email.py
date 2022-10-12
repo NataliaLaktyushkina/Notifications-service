@@ -22,7 +22,8 @@ class EmailSender:
         self.output = ''
 
     def add_header(self, receivers: list[str], msg_subject: str) -> None:  # type: ignore
-        self.message['From'] = self.mail_user  # Вне зависимости от того, что вы укажете в этом поле, Gmail подставит ваши данные
+        self.message[
+            'From'] = self.mail_user  # Вне зависимости от того, что вы укажете в этом поле, Gmail подставит ваши данные
         self.message['To'] = ','.join(receivers)  # Попробуйте отправить письмо самому себе
         self.message['Subject'] = msg_subject
 
@@ -48,15 +49,20 @@ class EmailSender:
         self.server.close()
 
 
-def main(text: str) -> None:
+def main(receivers: list, subject: str, title: str,
+         template: str, text: str) -> None:
     email_sender = EmailSender()
-    email_sender.add_header(receivers=['education_tests@mail.ru'],
-                            msg_subject='A letter from me!')
-    email_sender.add_template(template_name='mail.html',
-                              title='This is title',
+    email_sender.add_header(receivers=receivers,
+                            msg_subject=subject)
+    email_sender.add_template(template_name=template,
+                              title=title,
                               text=text)
-    email_sender.send_msg(receivers=['education_tests@mail.ru'])
+    email_sender.send_msg(receivers=receivers)
 
 
 if __name__ == '__main__':
-    main(text='Looong text')
+    main(receivers=['education_tests@mail.ru'],
+         subject='Registration',
+         title='Registration complete',
+         template='mail.html',
+         text='Main text for debug')

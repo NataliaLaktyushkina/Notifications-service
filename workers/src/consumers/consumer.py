@@ -8,6 +8,9 @@ sys.path.append(os.path.dirname(__file__) + '/..')
 
 from settings.rabbitmq.config import rabbit_settings  # noqa: E402
 from consumer_services import send_email  # noqa: E402
+from consumer_services.additonal_data import additional_info_for_email  # noqa: E402
+
+
 rabbitmq_settings = rabbit_settings.rabbitmq_settings
 logger = logging.getLogger(__name__)
 
@@ -29,27 +32,38 @@ class Handler:
             blocked_connection_timeout=300,
         )
 
-    def get_msg(self, queue: str) -> None:
+    def get_msg(self) -> None:
         logger.info(self.parameters.host)
         connection = pika.BlockingConnection(parameters=self.parameters)
         channel = connection.channel()
-        # To be sure thar queue exists
-        channel.queue_declare(queue=queue, durable=True)
+        queues = ['registration', 'likes']
 
         def callback(ch, method, properties, body):  # type: ignore
             logger.info(body)
-            send_email.main('test consuming')
-
-        channel.basic_consume(queue=queue,
-                              auto_ack=True,
-                              on_message_callback=callback)
+            add_data = additional_info_for_email(method.routing_key)
+            if add_data:
+                send_email.main(add_data['receivers'],
+                                add_data['subject'],
+                                add_data['title'],
+                                add_data['template'],
+                                add_data['text'])
+            else:
+                logger.warning(f'There is not additional '
+                               f'data for routing key {method.routing_key}')
+        # To be sure thar queue exists
+        for queue in queues:
+            logger.info(f'Declaring queue {queue}')
+            channel.queue_declare(queue=queue, durable=True)
+            channel.basic_consume(queue=queue,
+                                  auto_ack=True,
+                                  on_message_callback=callback)
 
         channel.start_consuming()
 
 
-def main(queue: str = 'registration') -> None:
+def main() -> None:
     handler = Handler()
-    handler.get_msg(queue)
+    handler.get_msg()
 
 
 if __name__ == '__main__':

@@ -6,14 +6,6 @@ from typing import Dict
 
 from pydantic import BaseModel
 
-from models.json_config import BaseOrjsonModel
-
-
-class NotificationSent(BaseOrjsonModel):
-    """This is the description of critique post response  model."""
-
-    notification_sent: bool
-
 
 class Source(str, Enum):
     email = 'email'
@@ -23,7 +15,7 @@ class Source(str, Enum):
 
 class EventType(str, Enum):
     welcome_letter = 'welcome_letter'
-    critique_likes = 'critique_likes'
+    likes_number = 'likes_number'
 
 
 class Event(BaseModel):
@@ -31,3 +23,7 @@ class Event(BaseModel):
     event_type: EventType
     scheduled_datetime: datetime
     payload: Dict
+
+
+class EventSent(BaseModel):
+    event_sent: bool
