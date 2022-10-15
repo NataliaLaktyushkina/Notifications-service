@@ -44,7 +44,7 @@ class QueueRabbit(AbstractQueue):
     async def generate_event(self, user_id: str) -> Event:
         source = Source.email
         event_type = EventType.welcome_letter
-        scheduled_time = datetime(2022, 10, 9, 22, 30)
+        scheduled_time = datetime.now()
         payload = await self.generate_payload(user_id)
         return Event(source=source,
                      event_type=event_type,
@@ -56,7 +56,7 @@ class QueueRabbit(AbstractQueue):
     async def generate_payload(user_id: str) -> Dict:
         # payload - {users:
         #               [{user : {user_id : user_id_1},
-        #                 content: {movie: n, movie_2: n2}   # noqa: E800
+        #                 content: {user_id: user_id}   # noqa: E800
         #                   },
         #               ]}   # noqa: E800
         content = [{'user_id': user_id,
