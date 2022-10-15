@@ -23,7 +23,6 @@ PROTECTED = [Depends(JWTBearer)]  # noqa: WPS407
 @app.on_event('startup')
 async def startup() -> None:
     """Start up settings - connect to RabbitMQ"""
-    # global connection
 
     rabbitmq_settings = settings.rabbitmq_settings
 

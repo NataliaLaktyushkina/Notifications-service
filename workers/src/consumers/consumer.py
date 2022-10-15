@@ -1,3 +1,4 @@
+import json
 import logging
 import os
 import sys
@@ -40,16 +41,22 @@ class Handler:
 
         def callback(ch, method, properties, body):  # type: ignore
             logger.info(body)
-            add_data = additional_info_for_email(method.routing_key)
-            if add_data:
-                send_email.main(add_data['receivers'],
-                                add_data['subject'],
-                                add_data['title'],
-                                add_data['template'],
-                                add_data['text'])
-            else:
-                logger.warning(f'There is not additional '
-                               f'data for routing key {method.routing_key}')
+            body_json = json.loads(body.decode('utf-8'))
+            payload = body_json['payload']
+            for user in payload['users']:
+                content = user['content']
+                add_data = additional_info_for_email(
+                    method.routing_key, user['user']['user_id'], content,
+                )
+                if add_data:
+                    send_email.main(add_data['receivers'],
+                                    add_data['subject'],
+                                    add_data['title'],
+                                    add_data['template'],
+                                    add_data['text'])
+                else:
+                    logger.warning(f'There is not additional '
+                                   f'data for routing key {method.routing_key}')
         # To be sure thar queue exists
         for queue in queues:
             logger.info(f'Declaring queue {queue}')
