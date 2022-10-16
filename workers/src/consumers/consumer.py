@@ -1,3 +1,4 @@
+import json
 import logging
 import os
 import sys
@@ -7,9 +8,8 @@ import pika
 sys.path.append(os.path.dirname(__file__) + '/..')
 
 from settings.rabbitmq.config import rabbit_settings  # noqa: E402
-from consumer_services import send_email  # noqa: E402
-from consumer_services.additonal_data import additional_info_for_email  # noqa: E402
 
+from consumer_services.generate_email import generate_email  # noqa: E402
 
 rabbitmq_settings = rabbit_settings.rabbitmq_settings
 logger = logging.getLogger(__name__)
@@ -22,7 +22,7 @@ class Handler:
         credentials = pika.PlainCredentials(
             rabbitmq_settings.RABBITMQ_USER,
             rabbitmq_settings.RABBITMQ_PASS,
-            )
+        )
 
         self.parameters = pika.ConnectionParameters(
             host=rabbitmq_settings.RABBITMQ_HOST,
@@ -40,19 +40,13 @@ class Handler:
 
         def callback(ch, method, properties, body):  # type: ignore
             logger.info(body)
-            add_data = additional_info_for_email(method.routing_key)
-            if add_data:
-                send_email.main(add_data['receivers'],
-                                add_data['subject'],
-                                add_data['title'],
-                                add_data['template'],
-                                add_data['text'])
-            else:
-                logger.warning(f'There is not additional '
-                               f'data for routing key {method.routing_key}')
-        # To be sure thar queue exists
+            body_json = json.loads(body.decode('utf-8'))
+            if body_json['source'] == 'email':
+                generate_email(method, body_json)
+
         for queue in queues:
             logger.info(f'Declaring queue {queue}')
+            # To be sure thar queue exists
             channel.queue_declare(queue=queue, durable=True)
             channel.basic_consume(queue=queue,
                                   auto_ack=True,

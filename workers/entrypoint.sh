@@ -1,6 +1,6 @@
 #!/bin/sh
 
-echo "Waiting for Rabbit mq .."
+echo "Waiting for Rabbit mq ..."
 
 while ! nc -z rabbit_mq 5672; do
   sleep 2
