@@ -4,14 +4,14 @@
 
 Схема сервиса:
 
-![scheme](/scheme/Notification_service.jpeg)
+![scheme](/scheme/Notification%20scheme.png)
 
 
 Запуск базы данных из папки **MongoDB**:
 
 `docker compose up`
 
-**Запуск API & Consumers:**
+**Запуск API & Workers:**
 
 `docker compose up` из корня проекта
 
@@ -29,7 +29,7 @@ Workers:
 
 [rabbitmq](/workers/src/settings/rabbitmq/.env.example)
 
-###Приветственное письмо после регистрации пользователя ###
+###Приветственное письмо после регистрации пользователя: ###
 API -> Queue -> Worker -> Email
 
 **API** *127.0.0.1:80/api/openapi*
@@ -43,5 +43,14 @@ API -> Queue -> Worker -> Email
 API кладет сообщение в очередь (RabbitMQ),
 далее consumer в реальном времени читает очередь и отправляет письмо пользователю
 
-### CI / CD ###
+[Auth service]()
+
+###Периодические события: ###
+[Events generator](workers/src/events_generator/generator.py)
+
+
+###Admin panel: ###
+
+
+### CI / CD: ###
 [Workflow](.github/workflows/python.yml)
