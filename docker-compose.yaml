@@ -31,15 +31,29 @@ services:
     container_name: consumer
     build:
       context: workers
+    entrypoint: >
+      sh /app/entrypoint.sh
     depends_on:
       - rabbit_mq
 
-  scheduler:
-    container_name: scheduler
+  celery-beat:
+    container_name: celery_beat
     build:
-      context: scheduler
+      context: workers
+    entrypoint: >
+      sh /app/entrypoint_beat.sh
     depends_on:
       - rabbit_mq
+
+  celery-worker:
+    container_name: celery_worker
+    build:
+      context: workers
+    entrypoint: >
+      sh /app/entrypoint_worker.sh
+    depends_on:
+      - rabbit_mq
+
 
   nginx:
     container_name: nginx
@@ -49,7 +63,6 @@ services:
       - "80:80"
     depends_on:
       - fast_api
-
 
 
 networks:

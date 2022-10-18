@@ -13,12 +13,15 @@ RUN pip install --upgrade pip \
 
 COPY ./src /app
 
-# create entrypoint for kafka waiting
+# create entrypoint for rabbit mq waiting
 COPY ./entrypoint.sh   .
 RUN chmod +x entrypoint.sh
 
+COPY ./entrypoint_beat.sh .
+RUN chmod +x entrypoint_beat.sh
 
-ENTRYPOINT ["sh","/app/entrypoint.sh"]
+COPY ./entrypoint_worker.sh .
+RUN chmod +x entrypoint_worker.sh
 
 
-#CMD ["python","/app/consumers/consumer.py", "main"]
+#ENTRYPOINT ["sh","/app/entrypoint.sh"]
