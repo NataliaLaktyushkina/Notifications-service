@@ -9,3 +9,7 @@ done
 echo "Rabbit mq started"
 
 python /app/consumers/consumer.py main
+# shellcheck disable=SC2164
+cd events_generator
+celery -A generator beat -l info
+celery -A generator worker -l info

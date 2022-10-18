@@ -27,21 +27,13 @@ services:
     image: fast_api
 
 
-  consumer:
-    container_name: consumer
+  worker:
+    container_name: worker
     build:
       context: workers
     depends_on:
       - rabbit_mq
 
-#  scheduler:
-#    container_name: scheduler
-#    build:
-#      context: scheduler
-#    command:
-#      - celery -A main beat -l info
-#    depends_on:
-#      - rabbit_mq
 
   nginx:
     container_name: nginx
@@ -51,7 +43,6 @@ services:
       - "80:80"
     depends_on:
       - fast_api
-
 
 
 networks:
