@@ -1,5 +1,4 @@
 import logging
-from typing import Any
 
 from consumer_services import send_email  # noqa: E402
 from consumer_services.additonal_data import additional_info_for_email  # noqa: E402
