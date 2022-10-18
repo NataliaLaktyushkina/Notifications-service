@@ -27,10 +27,30 @@ services:
     image: fast_api
 
 
-  worker:
-    container_name: worker
+  consumer:
+    container_name: consumer
     build:
       context: workers
+    entrypoint: >
+      sh /app/entrypoint.sh
+    depends_on:
+      - rabbit_mq
+
+  celery-beat:
+    container_name: celery_beat
+    build:
+      context: workers
+    entrypoint: >
+      sh /app/entrypoint_beat.sh
+    depends_on:
+      - rabbit_mq
+
+  celery-worker:
+    container_name: celery_worker
+    build:
+      context: workers
+    entrypoint: >
+      sh /app/entrypoint_worker.sh
     depends_on:
       - rabbit_mq
 

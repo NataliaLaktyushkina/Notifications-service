@@ -7,7 +7,7 @@ def additional_info_for_email(routing_key: str,
     add_data: Dict[str, Union[List[str], str]] = {}
     if routing_key == 'registration':
         add_data['receivers'] = ['education_tests@mail.ru']
-        add_data['subject'] = f'Celery update {user}'
+        add_data['subject'] = f'Registration update {user}'
         add_data['title'] = 'Registration complete'
         add_data['template'] = 'mail.html'
         add_data['text'] = 'Thanks for registration'

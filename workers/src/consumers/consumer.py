@@ -37,7 +37,7 @@ class Handler:
         logger.info(self.parameters.host)
         connection = pika.BlockingConnection(parameters=self.parameters)
         channel = connection.channel()
-        queues = ['registration', 'likes', 'celery']
+        queues = ['registration']
 
         def callback(ch, method, properties, body):  # type: ignore
             logger.info(body)
@@ -52,7 +52,7 @@ class Handler:
             # To be sure thar queue exists
             channel.queue_declare(queue=queue, durable=True)
             channel.basic_consume(queue=queue,
-                                  auto_ack=True,
+                                  auto_ack=False,
                                   on_message_callback=callback)
 
         channel.start_consuming()
