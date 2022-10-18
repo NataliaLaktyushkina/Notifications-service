@@ -9,19 +9,19 @@ repos:
     -   id: check-yaml
     -   id: check-added-large-files
 
--   repo: local
-    hooks:
-    -   id: flake8
-        name: flake8
-        description: wemake-python-styleguide enforcement
-        entry: flake8
-        args: ["--config=flake8.cfg"]
-        language: python
-        types: [python]
-
-
--   repo: https://github.com/pre-commit/mirrors-mypy
-    rev: 9feadeb
-    hooks:
-    - id: mypy
-      args: [--python-version=3.9, --config=mypy.cfg]
+#-   repo: local
+#    hooks:
+#    -   id: flake8
+#        name: flake8
+#        description: wemake-python-styleguide enforcement
+#        entry: flake8
+#        args: ["--config=flake8.cfg"]
+#        language: python
+#        types: [python]
+#
+#
+#-   repo: https://github.com/pre-commit/mirrors-mypy
+#    rev: 9feadeb
+#    hooks:
+#    - id: mypy
+#      args: [--python-version=3.9, --config=mypy.cfg]

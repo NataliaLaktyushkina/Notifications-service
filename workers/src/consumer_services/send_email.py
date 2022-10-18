@@ -3,6 +3,7 @@ import smtplib
 from email.message import EmailMessage
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 from settings.email import config
+from typing import List
 
 
 class EmailSender:
@@ -21,9 +22,8 @@ class EmailSender:
         self.message = EmailMessage()
         self.output = ''
 
-    def add_header(self, receivers: list[str], msg_subject: str) -> None:  # type: ignore
-        self.message[
-            'From'] = self.mail_user  # Вне зависимости от того, что вы укажете в этом поле, Gmail подставит ваши данные
+    def add_header(self, receivers: List[str], msg_subject: str) -> None:  # type: ignore
+        self.message['From'] = self.mail_user  # Вне зависимости от того, что вы укажете в этом поле, Gmail подставит ваши данные
         self.message['To'] = ','.join(receivers)  # Попробуйте отправить письмо самому себе
         self.message['Subject'] = msg_subject
 
@@ -39,7 +39,7 @@ class EmailSender:
         })  # Заполняем шаблон нужной информацией
         # В jinja2 также есть асинхронный рендер: template.render_async
 
-    def send_msg(self, receivers: list[str]) -> None:  # type: ignore
+    def send_msg(self, receivers: List[str]) -> None:  # type: ignore
         # Для отправки HTML-письма нужно вместо метода `set_content` использовать `add_alternative` с subtype "html",
         # Иначе пользователю придёт набор тегов вместо красивого письма
         self.message.add_alternative(self.output, subtype='html')

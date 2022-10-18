@@ -1,16 +1,28 @@
 import asyncio
+import json
 import uuid
 from datetime import datetime
 from random import randint
 
 import backoff
 import pika
+from celery import Celery
 
 from core.config import settings
 from db import queue_rabbit
 from schedul_models.events import Event, Source, EventType, EventSent
 from schedul_services.events import QueueHandler
 from schedul_services.scheduler_queue import QueueRabbit
+
+broker_url = 'amqp://my_user:my_pass@127.0.0.1:5672'
+app = Celery('main', broker=broker_url)
+
+app.conf.beat_schedule = {
+        "run-me-every-ten-seconds": {
+            "task": "main.generate_event",
+            "schedule": 10.0
+        }
+    }
 
 USERS_NUMBER = settings.USERS_NUMBER
 MOVIES_NUMBER = settings.MOVIES_NUMBER
@@ -49,16 +61,29 @@ def get_payload_likes() -> dict:
     return payload
 
 
-def generate_event() -> Event:
+@app.task
+def generate_event() -> None:
     source = Source.email
     event_type = EventType.likes_number
-    scheduled_time = datetime(2022, 10, 9, 22, 30)
+    scheduled_time = datetime.now()
     payload = get_payload_likes()
-    return Event(source=source,
+    event = Event(source=source,
                  event_type=event_type,
                  scheduled_datetime=scheduled_time,
                  payload=payload,
                  )
+    await startup()
+    rabbitmq = await queue_rabbit.get_connection()
+    await put_event_to_queue(event, QueueHandler(QueueRabbit(rabbitmq)))
+
+    # return event.json()
+    # return  put_event_to_queue(event, QueueHandler(QueueRabbit(rabbitmq)))
+
+    # return Event(source=source,
+    #              event_type=event_type,
+    #              scheduled_datetime=scheduled_time,
+    #              payload=payload,
+    #              )
 
 
 async def put_event_to_queue(
@@ -92,11 +117,15 @@ async def startup() -> None:
 
 
 async def main() -> EventSent:
-    await startup()
-    rabbitmq = await queue_rabbit.get_connection()
-    event = generate_event()
-    return await put_event_to_queue(event, QueueHandler(QueueRabbit(rabbitmq)))
+    pass
+    # await startup()
+    # rabbitmq = await queue_rabbit.get_connection()
+    # обернуть в celery
+    # event = generate_event()
+
+    # return await put_event_to_queue(event, QueueHandler(QueueRabbit(rabbitmq)))
 
 
 if __name__ == '__main__':
-    asyncio.run(main())
+    generate_event()
+    # asyncio.run(main())

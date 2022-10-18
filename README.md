@@ -29,8 +29,10 @@ Workers:
 
 [rabbitmq](/workers/src/settings/rabbitmq/.env.example)
 
-###API ###
-*127.0.0.1:80/api/openapi*
+###Приветственное письмо после регистрации пользователя ###
+API -> Queue -> Worker -> Email
+
+**API** *127.0.0.1:80/api/openapi*
 
 - Регистрация пользователя */api/v1/user_registration*:
 

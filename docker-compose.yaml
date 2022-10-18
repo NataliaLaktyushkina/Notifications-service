@@ -34,12 +34,14 @@ services:
     depends_on:
       - rabbit_mq
 
-  scheduler:
-    container_name: scheduler
-    build:
-      context: scheduler
-    depends_on:
-      - rabbit_mq
+#  scheduler:
+#    container_name: scheduler
+#    build:
+#      context: scheduler
+#    command:
+#      - celery -A main beat -l info
+#    depends_on:
+#      - rabbit_mq
 
   nginx:
     container_name: nginx

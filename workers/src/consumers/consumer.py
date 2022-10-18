@@ -5,6 +5,7 @@ import sys
 
 import pika
 
+
 sys.path.append(os.path.dirname(__file__) + '/..')
 
 from settings.rabbitmq.config import rabbit_settings  # noqa: E402
@@ -36,13 +37,15 @@ class Handler:
         logger.info(self.parameters.host)
         connection = pika.BlockingConnection(parameters=self.parameters)
         channel = connection.channel()
-        queues = ['registration', 'likes']
+        queues = ['registration', 'likes', 'celery']
 
         def callback(ch, method, properties, body):  # type: ignore
             logger.info(body)
             body_json = json.loads(body.decode('utf-8'))
-            if body_json['source'] == 'email':
-                generate_email(method, body_json)
+            # if body_json['source'] == 'email':
+            generate_email(method.routing_key, body_json)
+            # msg can be deleted:
+            ch.basic_ack(delivery_tag=method.delivery_tag)
 
         for queue in queues:
             logger.info(f'Declaring queue {queue}')
