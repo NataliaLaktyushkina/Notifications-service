@@ -78,8 +78,7 @@ def generate_event() -> None:
                   scheduled_datetime=scheduled_time,
                   payload=payload,
                   )
-    event_j = event.json()
-    generate_email('celery', json.loads(event_j))
+    generate_email('celery', json.loads(event.json()))
 
 
 if __name__ == '__main__':

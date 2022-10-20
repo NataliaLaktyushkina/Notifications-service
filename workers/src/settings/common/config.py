@@ -17,6 +17,7 @@ class Settings(BaseSettings):
     SCHEDULE: Optional[int]
     HOUR: Optional[str]
     MINUTE: Optional[str]
+    AUTH_SERVICE: Optional[str]
 
     class Config:
         env_file = '.env'
