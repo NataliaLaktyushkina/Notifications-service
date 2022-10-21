@@ -50,8 +50,8 @@ jobs:
       name: Mypy
       if: ${{ always() }}
       run: |
-        mypy . --config=mypy.cfg --explicit-package-bases --namespace-packages
-        mypy --install-types --non-interactive src/
+        mypy . --install-types --config=mypy.cfg --explicit-package-bases --namespace-packages
+
 #      continue-on-error: true
 
     - name: send telegram message
