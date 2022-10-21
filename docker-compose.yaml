@@ -25,10 +25,14 @@ services:
     build:
       context: fast_api
     image: fast_api
+    depends_on:
+      - rabbit_mq
 
 
   consumer:
     container_name: consumer
+    extra_hosts:
+      - host.docker.internal:host-gateway
     build:
       context: workers
     entrypoint: >
@@ -56,11 +60,11 @@ services:
 
 
   nginx:
-    container_name: nginx
+    container_name: notifications_nginx
     build:
       context: ./nginx
     ports:
-      - "80:80"
+      - "81:80"
     depends_on:
       - fast_api
 

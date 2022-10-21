@@ -4,7 +4,7 @@
 
 Схема сервиса:
 
-![scheme](/scheme/Notification%20scheme.png)
+![scheme](/scheme/Notification_scheme.png)
 
 
 Запуск базы данных из папки **MongoDB**:
@@ -32,7 +32,7 @@ Workers:
 ###Приветственное письмо после регистрации пользователя: ###
 API -> Queue -> Worker -> Email
 
-**API** *127.0.0.1:80/api/openapi*
+**API** *127.0.0.1:81/api/openapi*
 
 - Регистрация пользователя */api/v1/user_registration*:
 
@@ -43,7 +43,7 @@ API -> Queue -> Worker -> Email
 API кладет сообщение в очередь (RabbitMQ),
 далее consumer в реальном времени читает очередь и отправляет письмо пользователю
 
-[Auth service]()
+[Auth service](https://github.com/NataliaLaktyushkina/Auth_sprint_2)
 
 ###Периодические события: ###
 [Events generator](workers/src/events_generator/generator.py)

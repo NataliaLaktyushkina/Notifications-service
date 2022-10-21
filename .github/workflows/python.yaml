@@ -31,6 +31,8 @@ jobs:
         pip install wemake-python-styleguide
         pip install flake8-html
         pip install mypy
+        mypy --install-types --non-interactive src/
+
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
       continue-on-error: true
 
@@ -48,7 +50,8 @@ jobs:
       name: Mypy
       if: ${{ always() }}
       run: |
-        mypy . --config=mypy.cfg --explicit-package-bases --namespace-packages
+        mypy . --install-types --non-interactive  --config=mypy.cfg --explicit-package-bases --namespace-packages
+
 #      continue-on-error: true
 
     - name: send telegram message
