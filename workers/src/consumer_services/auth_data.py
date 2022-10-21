@@ -1,8 +1,9 @@
 import json
 import logging
+import random
 import os
 import sys
-from typing import Any
+from typing import Any, Union
 
 import requests
 
@@ -26,9 +27,18 @@ def get_data_from_auth(user_id: str) -> Any:
         params=params,
     )
     logger.info(response.content)
-    print(response.content)
     json_data = json.loads(response.content)
     return json_data['user']
+
+
+def get_random_user() -> Union[str, Any]:
+    response = requests.get(
+        f'{settings.AUTH_SERVICE}/v1/users_list',
+    )
+    json_data = json.loads(response.content)
+    users = json_data['users']
+    logger.info(users)
+    return random.choice(users)  # noqa: S311
 
 
 if __name__ == '__main__':

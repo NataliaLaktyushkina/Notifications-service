@@ -14,6 +14,7 @@ from consumer_services.generate_email import generate_email  # noqa: E402
 from worker_models.events import Event, EventType, Source   # noqa: E402
 from settings.common.config import settings   # noqa: E402
 from settings.rabbitmq.config import rabbit_settings   # noqa: E402
+from consumer_services.auth_data import get_random_user   # noqa: E402
 
 # broker_url = 'amqp://my_user:my_pass@127.0.0.1:5672'  # noqa: E800
 USER = rabbit_settings.rabbitmq_settings.RABBITMQ_USER
@@ -48,8 +49,8 @@ def get_payload_likes() -> dict:
     users_list = []
 
     for _i in range(USERS_NUMBER):
-
-        user_id = uuid.uuid4()
+        # Заменить на выбор user_id из БД
+        user_id = get_random_user()
         content = []
         for _j in range(randint(1, MOVIES_NUMBER)):  # noqa: S311
             movie_id = uuid.uuid4()
