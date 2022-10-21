@@ -51,6 +51,7 @@ jobs:
       if: ${{ always() }}
       run: |
         mypy . --config=mypy.cfg --explicit-package-bases --namespace-packages
+        mypy --install-types --non-interactive src/
 #      continue-on-error: true
 
     - name: send telegram message
