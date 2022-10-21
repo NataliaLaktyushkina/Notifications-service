@@ -55,7 +55,9 @@ class QueueRabbit(AbstractQueue):
     @staticmethod
     async def generate_payload(user_id: str) -> Dict:
         # payload - {users:
-        #               [{user : {user_id : user_id_1},
+        #               [{user : {user_id : user_id_1,
+        #                         name: login,
+        #                         email: email},
         #                 content: {user_id: user_id}   # noqa: E800
         #                   },
         #               ]}   # noqa: E800
