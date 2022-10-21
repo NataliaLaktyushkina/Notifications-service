@@ -3,7 +3,7 @@ import smtplib
 from email.message import EmailMessage
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 from settings.email import config
-from typing import List
+from typing import List, Union
 
 
 class EmailSender:
@@ -39,13 +39,16 @@ class EmailSender:
         })  # Заполняем шаблон нужной информацией
         # В jinja2 также есть асинхронный рендер: template.render_async
 
-    def send_msg(self, receivers: List[str]) -> None:  # type: ignore
+    def send_msg(self, receivers: List[str]) -> Union[None, str]:  # type: ignore
         # Для отправки HTML-письма нужно вместо метода `set_content` использовать `add_alternative` с subtype "html",
         # Иначе пользователю придёт набор тегов вместо красивого письма
         self.message.add_alternative(self.output, subtype='html')
-        self.server.sendmail(from_addr=self.mail_user,
-                             to_addrs=receivers,
-                             msg=self.message.as_string())
+        try:
+            self.server.sendmail(from_addr=self.mail_user,
+                                 to_addrs=receivers,
+                                 msg=self.message.as_string())
+        except smtplib.SMTPDataError:
+            return 'user not found'
         self.server.close()
 
 
