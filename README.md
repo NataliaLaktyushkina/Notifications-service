@@ -32,8 +32,10 @@ Workers:
 ###Приветственное письмо после регистрации пользователя: ###
 API -> Queue -> Worker -> Email
 
+
 **API**:
 *127.0.0.1:81/api/openapi*
+
 
 - Регистрация пользователя */api/v1/user_registration*:
 
