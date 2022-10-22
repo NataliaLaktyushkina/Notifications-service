@@ -1,6 +1,6 @@
 """Endpoints of users API"""
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Query
 from models.events import EventSent
 from services.mailing import get_db, QueueHandler
 
@@ -14,7 +14,7 @@ async def create_mailing(
         title: str,
         text: str,
         subject: str,
-        receivers: list[str],  # type: ignore
+        receivers: list[str] = Query(default=[]),  # type: ignore
         service: QueueHandler = Depends(get_db),
 ) -> EventSent:
     """Send letters to users."""
