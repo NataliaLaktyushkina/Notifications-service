@@ -3,7 +3,7 @@ from typing import Dict, List, Union
 
 def additional_info_for_email(routing_key: str,
                               user: dict,
-                              content: List) -> dict:
+                              content: dict) -> dict:
     add_data: Dict[str, Union[List[str], str]] = {}
     if routing_key == 'registration':
         add_data['receivers'] = [user['email']]
@@ -21,5 +21,10 @@ def additional_info_for_email(routing_key: str,
             movie: dict  # type: ignore
             add_data['text'] = '\n'.join([add_data['text'], ':'.join([movie['movie_id'],  # type: ignore
                                                                       str(movie['likes'])])])
-
+    elif routing_key == 'admin_mailing':
+        add_data['receivers'] = [user['email']]
+        add_data['subject'] = content['subject']
+        add_data['title'] = content['title']
+        add_data['template'] = 'mail.html'
+        add_data['text'] = content['text']
     return add_data

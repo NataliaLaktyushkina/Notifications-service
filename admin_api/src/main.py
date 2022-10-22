@@ -52,7 +52,7 @@ async def shutdown() -> None:
 
 
 app.include_router(
-    mailing.router, prefix='/adminapi/v1/users',
+    mailing.router, prefix='/adminapi/v1/create_mailing',
     tags=['mailing'], dependencies=PROTECTED,
 )
 

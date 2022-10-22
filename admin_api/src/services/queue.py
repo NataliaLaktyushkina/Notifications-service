@@ -13,7 +13,9 @@ rabbitmq_settings = settings.rabbitmq_settings
 class AbstractQueue(abc.ABC):
 
     @abc.abstractmethod
-    async def send_msg(self, user_id: str) -> EventSent:
+    async def send_msg(
+            self, title: str, text: str,
+            subject: str, receivers: list[str]) -> EventSent:  # type: ignore
         pass
 
 
@@ -33,19 +35,27 @@ class QueueRabbit(AbstractQueue):
         )
         self.channel.queue_declare(queue=rabbitmq_settings.RABBITMQ_QUEUE_NAME, durable=True)
 
-    async def send_msg(self, user_id: str) -> EventSent:
-        event = await self.generate_event(user_id)
+    async def send_msg(
+            self, title: str, text: str,
+            subject: str, receivers: list[str],  # type: ignore
+    ) -> EventSent:
+        event = await self.generate_event(
+            title, text, subject, receivers)
         self.channel.basic_publish(exchange='',
                                    routing_key=rabbitmq_settings.RABBITMQ_QUEUE_NAME,
                                    body=event.json())
 
         return EventSent(event_sent=True)
 
-    async def generate_event(self, user_id: str) -> Event:
+    async def generate_event(
+            self, title: str, text: str,
+            subject: str, receivers: list[str],  # type: ignore
+    ) -> Event:
         source = Source.email
-        event_type = EventType.welcome_letter
+        event_type = EventType.mailing_list
         scheduled_time = datetime.now()
-        payload = await self.generate_payload(user_id)
+        payload = await self.generate_payload(
+            title, text, subject, receivers)
         return Event(source=source,
                      event_type=event_type,
                      scheduled_datetime=scheduled_time,
@@ -53,7 +63,9 @@ class QueueRabbit(AbstractQueue):
                      )
 
     @staticmethod
-    async def generate_payload(user_id: str) -> Dict:
+    async def generate_payload(
+            title: str, text: str,
+            subject: str, receivers: list[str]) -> Dict:  # type: ignore
         # payload - {users:
         #               [{user : {user_id : user_id_1,
         #                         name: login,
@@ -61,12 +73,14 @@ class QueueRabbit(AbstractQueue):
         #                 content: {user_id: user_id}   # noqa: E800
         #                   },
         #               ]}   # noqa: E800
-        content = [{'user_id': user_id,
-                    }]
-        users_list = [{'user':
-                           {'user_id': user_id},
-                       'content': content,
-                       }]
+        users_list = []
+        for user_id in receivers:
+            user = {'user_id': user_id}
+            content = {'title': title,
+                       'text': text,
+                       'subject': subject}
+            users_list.append({'user': user,
+                               'content': content})
 
         payload = {'users': users_list}
         return payload

@@ -8,8 +8,12 @@ class QueueHandler:
     def __init__(self, queue: AbstractQueue):
         self.queue = queue
 
-    async def send_notification(self, user_id: str) -> EventSent:
-        event_sent = await self.queue.send_msg(user_id)
+    async def send_notification(
+            self, title: str, text: str,
+            subject: str, receivers: list[str]) -> EventSent:  # type: ignore
+        event_sent = await self.queue.send_msg(
+            title, text, subject, receivers,
+        )
         return event_sent
 
 

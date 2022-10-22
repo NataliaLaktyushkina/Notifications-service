@@ -16,6 +16,7 @@ class Source(str, Enum):
 class EventType(str, Enum):
     welcome_letter = 'welcome_letter'
     critique_likes = 'critique_likes'
+    mailing_list = 'mailing_list'
 
 
 class Event(BaseModel):

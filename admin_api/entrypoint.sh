@@ -16,4 +16,4 @@ done
 
 echo "Rabbit mq started"
 
-gunicorn -k uvicorn.workers.UvicornWorker -b 0.0.0.0:8102 main:app
+gunicorn -k uvicorn.workers.UvicornWorker -b 0.0.0.0:8102  main:app

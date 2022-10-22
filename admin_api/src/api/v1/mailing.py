@@ -2,18 +2,21 @@
 
 from fastapi import APIRouter, Depends
 from models.events import EventSent
-from services.jwt_check import JWTBearer
-from services.users import get_db, QueueHandler
+from services.mailing import get_db, QueueHandler
 
 router = APIRouter()
 
 
-@router.post('/', description='New user',
-             response_description='User registration',
+@router.post('/', description='Create new mailing',
+             response_description='Mailing created',
              )
-async def user_registration(
-        user_id: str = Depends(JWTBearer()),
+async def create_mailing(
+        title: str,
+        text: str,
+        subject: str,
+        receivers: list[str],  # type: ignore
         service: QueueHandler = Depends(get_db),
 ) -> EventSent:
-    """Send welcome letter to user."""
-    return await service.send_notification(user_id=user_id)
+    """Send letters to users."""
+    return await service.send_notification(
+        title, text, subject, receivers)
