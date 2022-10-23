@@ -1,7 +1,10 @@
+from datetime import datetime
+
 from fastapi import Depends
-from services.queue import AbstractQueue, QueueRabbit
-from models.events import EventSent
+
 from db.queue_rabbit import get_connection
+from models.events import EventSent
+from services.queue import AbstractQueue, QueueRabbit
 
 
 class QueueHandler:
@@ -10,9 +13,11 @@ class QueueHandler:
 
     async def send_notification(
             self, title: str, text: str,
-            subject: str, receivers: list[str]) -> EventSent:  # type: ignore
+            subject: str, receivers: list[str],  # type: ignore
+            scheduled_time: datetime,
+    ) -> EventSent:  # type: ignore
         event_sent = await self.queue.send_msg(
-            title, text, subject, receivers,
+            title, text, subject, receivers, scheduled_time,
         )
         return event_sent
 

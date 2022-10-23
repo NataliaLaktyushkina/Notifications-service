@@ -1,4 +1,5 @@
 """Endpoints of users API"""
+from datetime import datetime
 
 from fastapi import APIRouter, Depends, Query
 from models.events import EventSent
@@ -15,8 +16,9 @@ async def create_mailing(
         text: str,
         subject: str,
         receivers: list[str] = Query(default=[]),  # type: ignore
+        scheduled_time: datetime = Query(default=datetime.now()),
         service: QueueHandler = Depends(get_db),
 ) -> EventSent:
     """Send letters to users."""
     return await service.send_notification(
-        title, text, subject, receivers)
+        title, text, subject, receivers, scheduled_time)
