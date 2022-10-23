@@ -1,4 +1,4 @@
-"""Endpoints of users API"""
+"""Endpoints of users API."""
 from datetime import datetime
 
 from fastapi import APIRouter, Depends, Query
