@@ -22,4 +22,5 @@ async def create_mailing(
 ) -> EventSent:
     """Send letters to users."""
     return await service.send_notification(
-        title, text, subject, receivers, scheduled_time)
+        title, text, subject, receivers, scheduled_time,
+    )

@@ -16,8 +16,11 @@ class QueueHandler:
             subject: str, receivers: list[str],  # type: ignore
             scheduled_time: datetime,
     ) -> EventSent:  # type: ignore
+
+        delay = (scheduled_time - datetime.now()).seconds*1000
+
         event_sent = await self.queue.send_msg(
-            title, text, subject, receivers, scheduled_time,
+            title, text, subject, receivers, str(delay),
         )
         return event_sent
 

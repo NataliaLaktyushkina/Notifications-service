@@ -1,5 +1,4 @@
 import abc
-from datetime import datetime
 from typing import Dict
 
 from pika import BasicProperties
@@ -17,7 +16,7 @@ class AbstractQueue(abc.ABC):
     async def send_msg(
             self, title: str, text: str,
             subject: str, receivers: list[str],  # type: ignore
-            scheduled_time: datetime,
+            delay: str,
     ) -> EventSent:  # type: ignore
         pass
 
@@ -56,12 +55,12 @@ class QueueRabbit(AbstractQueue):
     async def send_msg(
             self, title: str, text: str,
             subject: str, receivers: list[str],  # type: ignore
-            scheduled_time: datetime,
+            delay: str,
     ) -> EventSent:
         event = await self.generate_event(
-            title, text, subject, receivers, scheduled_time,
+            title, text, subject, receivers,
         )
-        msg_properties = BasicProperties(expiration='60000')  # Delay until the message is transferred in milliseconds.
+        msg_properties = BasicProperties(expiration=delay)  # Delay until the message is transferred in milliseconds.
         self.channel.basic_publish(exchange='',
                                    routing_key=rabbitmq_settings.RABBITMQ_QUEUE_DELAY,
                                    body=event.json(),
@@ -72,16 +71,13 @@ class QueueRabbit(AbstractQueue):
     async def generate_event(
             self, title: str, text: str,
             subject: str, receivers: list[str],  # type: ignore
-            scheduled_time: datetime,
     ) -> Event:
         source = Source.email
         event_type = EventType.mailing_list
-        scheduled_time = scheduled_time
         payload = await self.generate_payload(
             title, text, subject, receivers)
         return Event(source=source,
                      event_type=event_type,
-                     scheduled_datetime=scheduled_time,
                      payload=payload,
                      )
 
