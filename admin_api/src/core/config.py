@@ -32,9 +32,8 @@ class RabbitMQUser(BaseSettings):
     RABBITMQ_USER: Optional[str] = os.getenv('RABBITMQ_DEFAULT_USER')
     RABBITMQ_PASS: Optional[str] = os.getenv('RABBITMQ_DEFAULT_PASS')  # noqa: WPS115
 
-    RABBITMQ_EXCHANGE: Optional[str]
-    RABBITMQ_EXCHANGE_TYPE: Optional[str]
     RABBITMQ_QUEUE_NAME: Optional[str]
+    RABBITMQ_QUEUE_DELAY: Optional[str]
 
 
 class RabbitMQSettingsProm(RabbitMQUser):
