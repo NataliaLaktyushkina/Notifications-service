@@ -2,8 +2,9 @@
 from datetime import datetime
 
 from fastapi import APIRouter, Depends, Query
-from models.events import EventSent
 from services.mailing import get_db, QueueHandler
+
+from models.events import EventSent
 
 router = APIRouter()
 
