@@ -1,7 +1,6 @@
 """Endpoints of users API."""
 
 from datetime import datetime
-
 from fastapi import APIRouter, Depends, Query
 from services.mailing import get_db, QueueHandler
 
