@@ -49,7 +49,6 @@ def get_payload_likes() -> dict:
     users_list = []
 
     for _i in range(USERS_NUMBER):
-        # Заменить на выбор user_id из БД
         user_id = get_random_user()
         content = []
         for _j in range(randint(1, MOVIES_NUMBER)):  # noqa: S311

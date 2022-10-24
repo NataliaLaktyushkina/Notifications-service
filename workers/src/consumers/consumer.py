@@ -37,7 +37,7 @@ class Handler:
         logger.info(self.parameters.host)
         connection = pika.BlockingConnection(parameters=self.parameters)
         channel = connection.channel()
-        queues = ['registration']
+        queues = ['registration', 'admin_mailing']
 
         def callback(ch, method, properties, body):  # type: ignore
             logger.info(body)

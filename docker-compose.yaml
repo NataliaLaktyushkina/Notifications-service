@@ -28,6 +28,12 @@ services:
     depends_on:
       - rabbit_mq
 
+  admin_api:
+    container_name: admin_api
+    build:
+      context: admin_api
+    depends_on:
+      - rabbit_mq
 
   consumer:
     container_name: consumer
@@ -67,6 +73,7 @@ services:
       - "81:80"
     depends_on:
       - fast_api
+      - admin_api
 
 
 networks:

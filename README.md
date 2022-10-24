@@ -32,7 +32,10 @@ Workers:
 ###Приветственное письмо после регистрации пользователя: ###
 API -> Queue -> Worker -> Email
 
-**API** *127.0.0.1:81/api/openapi*
+
+**API**:
+*127.0.0.1:81/api/openapi*
+
 
 - Регистрация пользователя */api/v1/user_registration*:
 
@@ -50,7 +53,8 @@ API кладет сообщение в очередь (RabbitMQ),
 
 
 ###Admin panel: ###
-
+**API**:
+*http://127.0.0.1:81/adminapi/openapi*
 
 ### CI / CD: ###
 [Workflow](.github/workflows/python.yml)
