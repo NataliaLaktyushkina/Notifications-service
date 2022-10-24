@@ -21,7 +21,7 @@ services:
       retries: 1
 
   postgres_notifications:
-    container_name: postgres_db_notifications
+    container_name: postgres_notifications
     image: postgres:13
     restart: always
     env_file:

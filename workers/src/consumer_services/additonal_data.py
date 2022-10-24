@@ -1,10 +1,12 @@
 from typing import Dict, List, Union
+# from db_data import get_template_by_key  # noqa: E800
 
 
 def additional_info_for_email(routing_key: str,
                               user: dict,
                               content: dict) -> dict:
     add_data: Dict[str, Union[List[str], str]] = {}
+    # add_data['template'] = get_template_by_key(routing_key)  # noqa: E800
     if routing_key == 'registration':
         add_data['receivers'] = [user['email']]
         add_data['subject'] = f'Registration update for {user["name"]}'
