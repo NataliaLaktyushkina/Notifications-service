@@ -1,9 +1,11 @@
-import os
 import smtplib
 from email.message import EmailMessage
-from jinja2 import Environment, FileSystemLoader, select_autoescape
-from settings.email import config
 from typing import List, Union
+
+from jinja2 import Template
+
+from settings.email import config
+from worker_models.events import Templates
 
 
 class EmailSender:
@@ -27,11 +29,10 @@ class EmailSender:
         self.message['To'] = ','.join(receivers)  # Попробуйте отправить письмо самому себе
         self.message['Subject'] = msg_subject
 
-    def add_template(self, template_name: str,
+    def add_template(self, template: Templates,
                      title: str, text: str) -> None:
-        env = Environment(autoescape=select_autoescape(['html', 'htm', 'xml']),
-                          loader=FileSystemLoader(f'{os.path.dirname(__file__)}'))  # Указываем расположение шаблонов
-        template = env.get_template(template_name)  # 'mail.html'
+        template = Template(template.html)
+
         # В метод render передаются данные, которые нужно подставить в шаблон
         self.output = template.render(**{
             'title': title,
@@ -57,7 +58,7 @@ def main(receivers: list, subject: str, title: str,
     email_sender = EmailSender()
     email_sender.add_header(receivers=receivers,
                             msg_subject=subject)
-    email_sender.add_template(template_name=template,
+    email_sender.add_template(template=template,
                               title=title,
                               text=text)
     email_sender.send_msg(receivers=receivers)

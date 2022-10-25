@@ -20,6 +20,15 @@ services:
       timeout: 15s
       retries: 1
 
+  postgres_notifications:
+    container_name: postgres_notifications
+    image: postgres:13
+    restart: always
+    env_file:
+      - .env
+    volumes:
+      - ./postgresql/data:/var/lib/postgresql/data
+
   fast_api:
     container_name: fast_api
     build:
@@ -27,6 +36,7 @@ services:
     image: fast_api
     depends_on:
       - rabbit_mq
+      - postgres
 
   admin_api:
     container_name: admin_api

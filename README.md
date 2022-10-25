@@ -7,13 +7,21 @@
 ![scheme](/scheme/Notification_scheme.png)
 
 
-Запуск базы данных из папки **MongoDB**:
-
-`docker compose up`
-
 **Запуск API & Workers:**
 
 `docker compose up` из корня проекта
+
+**Alembic:**
+
+Необходимо запустить в папке с файлом *"alembic.ini":*
+
+`alembic revision -m "initial"`
+
+`alembic upgrade head`
+
+`alembic revision --autogenerate -m "create_tables"`
+
+`alembic upgrade head`
 
 **Переменные окружения**
 

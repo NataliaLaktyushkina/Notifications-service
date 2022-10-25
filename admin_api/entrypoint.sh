@@ -1,12 +1,11 @@
 #!/bin/sh
 
-echo "Waiting for Mongo DB..."
-
-while ! nc -z mongodb 27017; do
+echo "Waiting for Postgres DB..."
+while ! nc -z postgres 5432; do
   sleep 2
 done
 
-echo "Mongo DB started"
+echo "DB started"
 
 echo "Waiting for Rabbit mq ..."
 
