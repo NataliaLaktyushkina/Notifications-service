@@ -31,15 +31,19 @@ API:
 
 [Fast API](/fast_api/src/core/.env.example)
 
+[Admin_API](admin_api/src/core/.env.example)
+
 Workers:
 
 [email](/workers/src/settings/email/.env.example)
 
 [rabbitmq](/workers/src/settings/rabbitmq/.env.example)
 
-###Приветственное письмо после регистрации пользователя: ###
-API -> Queue -> Worker -> Email
+[postgres](/workers/src/settings/postgres/.env.example)
 
+[common](/workers/src/settings/common/.env.example)
+
+###Приветственное письмо после регистрации пользователя: ###
 
 **API**:
 *127.0.0.1:81/api/openapi*
