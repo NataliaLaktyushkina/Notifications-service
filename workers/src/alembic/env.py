@@ -6,7 +6,8 @@ from sqlalchemy import pool
 from alembic import context
 import sys, os
 sys.path.append(os.path.dirname(__file__) + '/..')
-from postgres_db import Base
+# from postgres_db import Base
+from worker_models import events
 from postgres_db import SQLALCHEMY_DATABASE_URI
 
 # this is the Alembic Config object, which provides
@@ -21,8 +22,8 @@ if config.config_file_name is not None:
 # add your model's MetaData object here
 # for 'autogenerate' support
 # from myapp import mymodel
-# target_metadata = mymodel.Base.metadata
-target_metadata = Base.metadata
+# target_metadata = mymodel.Base.metadat
+target_metadata = events.Base.metadata
 
 # other values from the config, defined by the needs of env.py,
 # can be acquired:
