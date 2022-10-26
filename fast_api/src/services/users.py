@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from fastapi import Depends
 from services.queue import AbstractQueue, QueueRabbit
 from models.events import EventSent, EventType
@@ -8,9 +10,13 @@ class QueueHandler:
     def __init__(self, queue: AbstractQueue):
         self.queue = queue
 
-    async def send_notification(self, user_id: str,
-                                event_type: EventType) -> EventSent:
-        event_sent = await self.queue.send_msg(user_id, event_type)
+    async def send_notification(
+            self, user_id: str, event_type: EventType,
+            scheduled_time: datetime,
+        ) -> EventSent:
+        event_sent = await self.queue.send_msg(
+            user_id, event_type, scheduled_time,
+        )
         return event_sent
 
 

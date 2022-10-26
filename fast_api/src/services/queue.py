@@ -13,7 +13,10 @@ rabbitmq_settings = settings.rabbitmq_settings
 class AbstractQueue(abc.ABC):
 
     @abc.abstractmethod
-    async def send_msg(self, user_id: str, event_type: EventType) -> EventSent:
+    async def send_msg(
+            self, user_id: str, event_type: EventType,
+            scheduled_time: datetime,
+    ) -> EventSent:
         pass
 
 
@@ -33,8 +36,14 @@ class QueueRabbit(AbstractQueue):
         )
         self.channel.queue_declare(queue=rabbitmq_settings.RABBITMQ_QUEUE_NAME, durable=True)
 
-    async def send_msg(self, user_id: str, event_type: EventType) -> EventSent:
-        event = await self.generate_event(user_id, event_type)
+    async def send_msg(
+            self, user_id: str,
+            event_type: EventType,
+            scheduled_time: datetime,
+    ) -> EventSent:
+        event = await self.generate_event(
+            user_id, event_type, scheduled_time,
+        )
         self.channel.basic_publish(exchange='',
                                    routing_key=rabbitmq_settings.RABBITMQ_QUEUE_NAME,
                                    body=event.json())
@@ -42,10 +51,11 @@ class QueueRabbit(AbstractQueue):
         return EventSent(event_sent=True)
 
     async def generate_event(self, user_id: str,
-                             event_type: EventType) -> Event:
+                             event_type: EventType,
+                             scheduled_time: datetime) -> Event:
         source = Source.email
         event_type = event_type
-        scheduled_time = datetime.now()
+        scheduled_time = scheduled_time
         payload = await self.generate_payload(user_id)
         return Event(source=source,
                      event_type=event_type,
