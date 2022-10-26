@@ -85,13 +85,6 @@ class QueueRabbit(AbstractQueue):
     async def generate_payload(
             title: str, text: str,
             subject: str, receivers: list[str]) -> Dict:  # type: ignore
-        # payload - {users:
-        #               [{user : {user_id : user_id_1,
-        #                         name: login,
-        #                         email: email},
-        #                 content: {user_id: user_id}   # noqa: E800
-        #                   },
-        #               ]}   # noqa: E800
         users_list = []
         for user_id in receivers:
             user = {'user_id': user_id}
