@@ -1,7 +1,7 @@
 """Endpoints of users API"""
 
 from fastapi import APIRouter, Depends
-from models.events import EventSent
+from models.events import EventSent, EventType
 from services.jwt_check import JWTBearer
 from services.users import get_db, QueueHandler
 
@@ -16,4 +16,5 @@ async def user_registration(
         service: QueueHandler = Depends(get_db),
 ) -> EventSent:
     """Send welcome letter to user."""
-    return await service.send_notification(user_id=user_id)
+    return await service.send_notification(user_id=user_id,
+                                           event_type=EventType.welcome_letter)

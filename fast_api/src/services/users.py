@@ -1,6 +1,6 @@
 from fastapi import Depends
 from services.queue import AbstractQueue, QueueRabbit
-from models.events import EventSent
+from models.events import EventSent, EventType
 from db.queue_rabbit import get_connection
 
 
@@ -8,8 +8,9 @@ class QueueHandler:
     def __init__(self, queue: AbstractQueue):
         self.queue = queue
 
-    async def send_notification(self, user_id: str) -> EventSent:
-        event_sent = await self.queue.send_msg(user_id)
+    async def send_notification(self, user_id: str,
+                                event_type: EventType) -> EventSent:
+        event_sent = await self.queue.send_msg(user_id, event_type)
         return event_sent
 
 
