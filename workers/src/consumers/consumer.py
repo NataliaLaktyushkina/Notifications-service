@@ -1,10 +1,11 @@
+import asyncio
 import json
 import logging
 import os
 import sys
 
-import pika
-
+import aio_pika
+from aio_pika.abc import AbstractRobustConnection
 
 sys.path.append(os.path.dirname(__file__) + '/..')
 
@@ -16,52 +17,58 @@ rabbitmq_settings = rabbit_settings.rabbitmq_settings
 logger = logging.getLogger(__name__)
 
 
-class Handler:
+async def connect() -> AbstractRobustConnection:
+    connection = aio_pika.connect_robust(
+        host=rabbitmq_settings.RABBITMQ_HOST,
+        port=rabbitmq_settings.RABBITMQ_PORT,
+        login=rabbitmq_settings.RABBITMQ_USER,
+        password=rabbitmq_settings.RABBITMQ_PASS,
+        heartbeat=600,
+        blocked_connection_timeout=300,
+    )
 
-    def __init__(self) -> None:
+    return await connection
 
-        credentials = pika.PlainCredentials(
-            rabbitmq_settings.RABBITMQ_USER,
-            rabbitmq_settings.RABBITMQ_PASS,
+
+async def process_message(
+        message: aio_pika.abc.AbstractIncomingMessage,
+) -> None:
+    async with message.process():
+        body_json = json.loads(message.body.decode('utf-8'))
+        generate_email(message.routing_key, body_json)
+        await asyncio.sleep(1)
+
+
+async def get_msg() -> None:
+    connection = await connect()
+
+    async with connection:
+
+        channel: aio_pika.abc.AbstractChannel = await connection.channel()
+
+        # Declaring queue - to be sure that queue exists
+        queue_registration: aio_pika.abc.AbstractQueue = await channel.declare_queue(
+            name='registration', durable=True, auto_delete=True,
+        )
+        queue_admin: aio_pika.abc.AbstractQueue = await channel.declare_queue(
+            name='admin_mailing', durable=True, auto_delete=True,
         )
 
-        self.parameters = pika.ConnectionParameters(
-            host=rabbitmq_settings.RABBITMQ_HOST,
-            port=rabbitmq_settings.RABBITMQ_PORT,
-            credentials=credentials,
-            heartbeat=600,
-            blocked_connection_timeout=300,
-        )
+        await queue_registration.consume(process_message)
+        await queue_admin.consume(process_message)
 
-    def get_msg(self) -> None:
-        logger.info(self.parameters.host)
-        connection = pika.BlockingConnection(parameters=self.parameters)
-        channel = connection.channel()
-        queues = ['registration', 'admin_mailing']
-
-        def callback(ch, method, properties, body):  # type: ignore
-            logger.info(body)
-            body_json = json.loads(body.decode('utf-8'))
-            # if body_json['source'] == 'email':
-            generate_email(method.routing_key, body_json)
-            # msg can be deleted:
-            ch.basic_ack(delivery_tag=method.delivery_tag)
-
-        for queue in queues:
-            logger.info(f'Declaring queue {queue}')
-            # To be sure thar queue exists
-            channel.queue_declare(queue=queue, durable=True)
-            channel.basic_consume(queue=queue,
-                                  auto_ack=False,
-                                  on_message_callback=callback)
-
-        channel.start_consuming()
+        try:
+            # Wait until terminate
+            await asyncio.Future()
+        finally:
+            await connection.close()
 
 
 def main() -> None:
-    handler = Handler()
-    handler.get_msg()
+    loop = asyncio.get_event_loop()
+    loop.run_until_complete(get_msg())
+    loop.close()
 
 
-if __name__ == '__main__':
+if __name__ =='__main__':
     main()

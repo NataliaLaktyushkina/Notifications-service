@@ -1,9 +1,9 @@
 from typing import Optional
 
-from pika import BlockingConnection
+from aio_pika import RobustConnection
 
-connection: Optional[BlockingConnection]= None
+connection: Optional[RobustConnection]= None
 
 
-async def get_connection() -> BlockingConnection:
+async def get_connection() -> RobustConnection:
     return connection

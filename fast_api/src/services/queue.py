@@ -2,7 +2,8 @@ import abc
 from datetime import datetime
 from typing import Dict
 
-from pika import BlockingConnection
+from aio_pika import Message, RobustConnection
+from aio_pika.abc import AbstractRobustExchange
 
 from core.config import settings
 from models.events import Event, EventSent, EventType, Source
@@ -22,19 +23,28 @@ class AbstractQueue(abc.ABC):
 
 class QueueRabbit(AbstractQueue):
 
-    def __init__(self, connection: BlockingConnection):
+    def __init__(self, connection: RobustConnection):
         self.connection = connection
-        self.channel = connection.channel()
+        self.routing_key = rabbitmq_settings.RABBITMQ_QUEUE_NAME
+
+    async def connect(self) -> AbstractRobustExchange:
+        channel = await self.connection.channel()
+        # Declaring exchange
         # the producer can only send messages to an exchange.
         # An exchange on one side receives messages from producers
         # and the other side it pushes them to queues.
         # The exchange must know exactly what to do with a message it receives.
-        self.channel.exchange_declare(
-            exchange=rabbitmq_settings.RABBITMQ_EXCHANGE,
-            exchange_type=rabbitmq_settings.RABBITMQ_EXCHANGE_TYPE,
+        exchange = await channel.declare_exchange(
+            'direct', auto_delete=True, durable=True)
+        # Declaring queue
+        queue = await channel.declare_queue(
+            name=rabbitmq_settings.RABBITMQ_QUEUE_NAME,
+            auto_delete=True,
             durable=True,
         )
-        self.channel.queue_declare(queue=rabbitmq_settings.RABBITMQ_QUEUE_NAME, durable=True)
+        # Binding queue
+        await queue.bind(exchange, self.routing_key)
+        return exchange
 
     async def send_msg(
             self, payload: Dict,
@@ -44,10 +54,11 @@ class QueueRabbit(AbstractQueue):
         event = await self.generate_event(
             payload, event_type, scheduled_time,
         )
-        self.channel.basic_publish(exchange='',
-                                   routing_key=rabbitmq_settings.RABBITMQ_QUEUE_NAME,
-                                   body=event.json())
-
+        exchange = await self.connect()
+        await exchange.publish(
+            Message(body=event.json().encode()),
+            self.routing_key,
+        )
         return EventSent(event_sent=True)
 
     @staticmethod

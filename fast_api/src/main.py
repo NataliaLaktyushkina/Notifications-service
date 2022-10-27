@@ -1,6 +1,6 @@
 
 import backoff
-import pika
+import aio_pika
 import uvicorn
 from fastapi import FastAPI, Depends
 from fastapi.responses import ORJSONResponse
@@ -26,29 +26,24 @@ async def startup() -> None:
 
     rabbitmq_settings = settings.rabbitmq_settings
 
-    credentials = pika.PlainCredentials(
-        rabbitmq_settings.RABBITMQ_USER,
-        rabbitmq_settings.RABBITMQ_PASS,
-    )
-    parameters = pika.ConnectionParameters(
-        host=rabbitmq_settings.RABBITMQ_HOST,
-        port=rabbitmq_settings.RABBITMQ_PORT,
-        credentials=credentials,
-        heartbeat=600,
-        blocked_connection_timeout=300,
-    )
+    @backoff.on_exception(backoff.expo, aio_pika.exceptions.AMQPConnectionError)
+    async def _connect() -> aio_pika.abc.AbstractRobustConnection:
+        return await aio_pika.connect_robust(
+            host=rabbitmq_settings.RABBITMQ_HOST,
+            port=rabbitmq_settings.RABBITMQ_PORT,
+            login=rabbitmq_settings.RABBITMQ_USER,
+            password=rabbitmq_settings.RABBITMQ_PASS,
+            heartbeat=600,
+            blocked_connection_timeout=300,
+        )
 
-    @backoff.on_exception(backoff.expo, pika.exceptions.AMQPConnectionError)
-    def _connect() -> pika.BlockingConnection:
-        return pika.BlockingConnection(parameters=parameters)
-
-    queue_rabbit.connection = _connect()
+    queue_rabbit.connection = await _connect()
 
 
 @app.on_event('shutdown')
 async def shutdown() -> None:
     """Shut down settings - disconnect from RabbitMQ"""
-    queue_rabbit.connection.close()  # type: ignore
+    await queue_rabbit.connection.close()  # type: ignore
 
 
 app.include_router(
