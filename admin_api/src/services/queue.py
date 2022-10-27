@@ -17,7 +17,7 @@ class AbstractQueue(abc.ABC):
             self, title: str, text: str,
             subject: str, receivers: list[str],  # type: ignore
             delay: str,
-    ) -> EventSent:  # type: ignore
+    ) -> EventSent:
         pass
 
 
@@ -31,8 +31,12 @@ class QueueRabbit(AbstractQueue):
         # An exchange on one side receives messages from producers
         # and the other side it pushes them to queues.
         # The exchange must know exactly what to do with a message it receives.
+
+        # Auto-delete (queue that has had at least one consumer is deleted
+        # when last consumer unsubscribes)
         self.channel.queue_declare(
-            queue=rabbitmq_settings.RABBITMQ_QUEUE_NAME, durable=True,
+            queue=rabbitmq_settings.RABBITMQ_QUEUE_NAME,
+            durable=True, auto_delete=True,
         )
 
         self.channel.queue_bind(
