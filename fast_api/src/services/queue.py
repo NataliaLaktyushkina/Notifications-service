@@ -14,7 +14,7 @@ class AbstractQueue(abc.ABC):
 
     @abc.abstractmethod
     async def send_msg(
-            self, user_id: str, event_type: EventType,
+            self, payload: Dict, event_type: EventType,
             scheduled_time: datetime,
     ) -> EventSent:
         pass
@@ -37,12 +37,12 @@ class QueueRabbit(AbstractQueue):
         self.channel.queue_declare(queue=rabbitmq_settings.RABBITMQ_QUEUE_NAME, durable=True)
 
     async def send_msg(
-            self, user_id: str,
+            self, payload: Dict,
             event_type: EventType,
             scheduled_time: datetime,
     ) -> EventSent:
         event = await self.generate_event(
-            user_id, event_type, scheduled_time,
+            payload, event_type, scheduled_time,
         )
         self.channel.basic_publish(exchange='',
                                    routing_key=rabbitmq_settings.RABBITMQ_QUEUE_NAME,
@@ -50,27 +50,16 @@ class QueueRabbit(AbstractQueue):
 
         return EventSent(event_sent=True)
 
-    async def generate_event(self, user_id: str,
+    @staticmethod
+    async def generate_event(payload: Dict,
                              event_type: EventType,
                              scheduled_time: datetime) -> Event:
         source = Source.email
         event_type = event_type
         scheduled_time = scheduled_time
-        payload = await self.generate_payload(user_id)
+        payload = payload
         return Event(source=source,
                      event_type=event_type,
                      scheduled_datetime=scheduled_time,
                      payload=payload,
                      )
-
-    @staticmethod
-    async def generate_payload(user_id: str) -> Dict:
-        content = [{'user_id': user_id,
-                    }]
-        users_list = [{'user':
-                           {'user_id': user_id},
-                       'content': content,
-                       }]
-
-        payload = {'users': users_list}
-        return payload
