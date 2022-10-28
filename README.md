@@ -43,6 +43,18 @@ Workers:
 
 [common](/workers/src/settings/common/.env.example)
 
+### Формат payload:
+```python
+payload = [{'users': ['user_id_1'],
+            'content':
+               {'movie': 1, 'movie_2': 1}
+            },
+            {'users': ['user_id_2'],
+            'content':
+               {'movie': 2, 'movie_2': 2}
+            }]
+```
+
 ### Приветственное письмо после регистрации пользователя:
 
 **API**:

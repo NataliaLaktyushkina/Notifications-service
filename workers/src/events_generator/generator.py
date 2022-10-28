@@ -11,12 +11,11 @@ from celery.schedules import crontab
 sys.path.append(os.path.dirname(__file__) + '/..')
 
 from consumer_services.generate_email import generate_email  # noqa: E402
-from worker_models.events import Event, EventType, Source   # noqa: E402
-from settings.common.config import settings   # noqa: E402
-from settings.rabbitmq.config import rabbit_settings   # noqa: E402
-from consumer_services.auth_data import get_random_user   # noqa: E402
+from worker_models.events import Event, EventType, Source  # noqa: E402
+from settings.common.config import settings  # noqa: E402
+from settings.rabbitmq.config import rabbit_settings  # noqa: E402
+from consumer_services.auth_data import get_random_user  # noqa: E402
 
-# broker_url = 'amqp://my_user:my_pass@127.0.0.1:5672'  # noqa: E800
 USER = rabbit_settings.rabbitmq_settings.RABBITMQ_USER
 PASS = rabbit_settings.rabbitmq_settings.RABBITMQ_PASS
 HOST = rabbit_settings.rabbitmq_settings.RABBITMQ_HOST
@@ -35,7 +34,7 @@ USERS_NUMBER = settings.USERS_NUMBER
 MOVIES_NUMBER = settings.MOVIES_NUMBER
 
 
-def get_payload_likes() -> dict:
+def get_payload_likes() -> list:
     # Для каждого пользователя свой список фильмов и рецензий к ним
     # payload - {users:
     #               [{user : {user_id : user_id_1},
@@ -46,7 +45,16 @@ def get_payload_likes() -> dict:
     #                  content: {movie: n, movie_2: n2}   # noqa: E800
     #                   }   # noqa: E800
     #               ]}   # noqa: E800
-    users_list = []
+
+    # payload = [{'users': ['user_id_1'],
+    #              'content': {'movie': 1, 'movie_2': 1}}, # noqa: E800
+    #            {'users': 'user_id_2',
+    #             'content': {'movie': 2, 'movie_2': 2}}]  # noqa: E800
+    #
+    # payload = [{'users': ['user_id' 'user_id_2'],
+    #            'content': content}]
+
+    payload = []
 
     for _i in range(USERS_NUMBER):
         user_id = get_random_user()
@@ -59,11 +67,9 @@ def get_payload_likes() -> dict:
                  'likes': n_likes,
                  },
             )
-        users_list.append({'user':
-                               {'user_id': user_id},
-                           'content': content,
-                           })
-    payload = {'users': users_list}
+        payload.append({'users': [user_id],
+                        'content': content,
+                        })
     return payload
 
 

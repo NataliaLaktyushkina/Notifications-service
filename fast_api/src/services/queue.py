@@ -1,6 +1,5 @@
 import abc
 from datetime import datetime
-from typing import Dict
 
 from aio_pika import Message, RobustConnection
 from aio_pika.abc import AbstractRobustExchange
@@ -15,7 +14,7 @@ class AbstractQueue(abc.ABC):
 
     @abc.abstractmethod
     async def send_msg(
-            self, payload: Dict, event_type: EventType,
+            self, payload: list, event_type: EventType,
             scheduled_time: datetime,
     ) -> EventSent:
         pass
@@ -47,7 +46,7 @@ class QueueRabbit(AbstractQueue):
         return exchange
 
     async def send_msg(
-            self, payload: Dict,
+            self, payload: list,
             event_type: EventType,
             scheduled_time: datetime,
     ) -> EventSent:
@@ -62,7 +61,7 @@ class QueueRabbit(AbstractQueue):
         return EventSent(event_sent=True)
 
     @staticmethod
-    async def generate_event(payload: Dict,
+    async def generate_event(payload: list,
                              event_type: EventType,
                              scheduled_time: datetime) -> Event:
         source = Source.email

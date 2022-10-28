@@ -7,13 +7,15 @@ from jinja2 import Template
 from settings.email import config
 from worker_models.events import Templates
 
+mail_settings = config.settings.email_settings
+smtp_settings = config.settings.smtp_settings
+
 
 class EmailSender:
 
     def __init__(self) -> None:
         """mail settings"""
-        mail_settings = config.settings.email_settings
-        smtp_settings = config.settings.smtp_settings
+
         self.mail_user = mail_settings.EMAIL_USER  # 'yourlogin@gmail.com'
         self.mail_password = mail_settings.EMAIL_PASS  # 'your-secret-pass'
 

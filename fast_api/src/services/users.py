@@ -1,5 +1,4 @@
 from datetime import datetime
-from typing import Dict
 
 from fastapi import Depends
 
@@ -13,7 +12,7 @@ class QueueHandler:
         self.queue = queue
 
     async def send_notification(
-            self, payload: Dict, event_type: EventType,
+            self, payload: list, event_type: EventType,
             scheduled_time: datetime,
         ) -> EventSent:
         event_sent = await self.queue.send_msg(
@@ -22,15 +21,11 @@ class QueueHandler:
         return event_sent
 
     @staticmethod
-    async def payload_user_registration(user_id: str) -> Dict:
-        content = [{'user_id': user_id,
-                    }]
-        users_list = [{'user':
-                           {'user_id': user_id},
-                       'content': content,
-                       }]
-
-        payload = {'users': users_list}
+    async def payload_user_registration(user_id: str) -> list:
+        receivers = [user_id]
+        content = [{'user_id': user_id }]
+        payload = [{'users': receivers,
+                   'content': content}]
         return payload
 
 
