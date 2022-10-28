@@ -1,7 +1,7 @@
 import json
 import logging
-import random
 import os
+import random
 import sys
 from typing import Any, Union
 
@@ -27,6 +27,9 @@ def get_data_from_auth(user_id: str) -> Any:
         params=params,
     )
     logger.info(response.content)
+    if not response.ok:
+        logger.info(f'no such user: {user_id}')
+        return {}
     json_data = json.loads(response.content)
     return json_data['user']
 
