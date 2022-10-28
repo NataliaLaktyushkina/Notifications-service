@@ -3,7 +3,6 @@
 import uuid
 from datetime import datetime
 from enum import Enum
-from typing import Dict
 
 from pydantic import BaseModel
 from sqlalchemy import Column, String, Text
@@ -27,7 +26,7 @@ class Event(BaseModel):
     source: Source
     event_type: EventType
     scheduled_datetime: datetime
-    payload: Dict
+    payload: list
 
 
 class EventSent(BaseModel):

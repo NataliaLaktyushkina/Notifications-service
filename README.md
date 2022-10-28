@@ -2,7 +2,7 @@
 
 [Репозиторий notifications_sprint_1 (проектная работа 10-го спринта)](https://github.com/NataliaLaktyushkina/notifications_sprint_1)
 
-Схема сервиса:
+**Схема сервиса:**
 
 ![scheme](/scheme/Notification_scheme.png)
 
@@ -43,9 +43,22 @@ Workers:
 
 [common](/workers/src/settings/common/.env.example)
 
-###Приветственное письмо после регистрации пользователя: ###
+### Формат payload:
+```python
+payload = [{'users': ['user_id_1'],
+            'content':
+               {'movie': 1, 'movie_2': 1}
+            },
+            {'users': ['user_id_2'],
+            'content':
+               {'movie': 2, 'movie_2': 2}
+            }]
+```
+
+### Приветственное письмо после регистрации пользователя:
 
 **API**:
+
 *127.0.0.1:81/api/openapi*
 
 
@@ -60,13 +73,14 @@ API кладет сообщение в очередь (RabbitMQ),
 
 [Auth service](https://github.com/NataliaLaktyushkina/Auth_sprint_2)
 
-###Периодические события: ###
+### Периодические события:
 [Events generator](workers/src/events_generator/generator.py)
 
 
-###Admin panel: ###
+### Admin panel:
 **API**:
+
 *http://127.0.0.1:81/adminapi/openapi*
 
-### CI / CD: ###
+### CI / CD:
 [Workflow](.github/workflows/python.yml)

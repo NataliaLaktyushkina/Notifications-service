@@ -12,17 +12,30 @@ class QueueHandler:
         self.queue = queue
 
     async def send_notification(
-            self, title: str, text: str,
-            subject: str, receivers: list[str],  # type: ignore
+            self, content: dict, receivers: list[str],  # type: ignore
             scheduled_time: datetime,
     ) -> EventSent:  # type: ignore
 
-        delay = (scheduled_time - datetime.now()).seconds*1000
-
+        delay = await self.calculate_delay(scheduled_time)
         event_sent = await self.queue.send_msg(
-            title, text, subject, receivers, str(delay),
+            content, receivers, str(delay),  #type: ignore
         )
         return event_sent
+
+    @staticmethod
+    async def calculate_delay(scheduled_time: datetime) -> int:
+        if scheduled_time < datetime.now():
+            delay = 0
+        else:
+            delay = (scheduled_time - datetime.now()).seconds * 1000
+        return delay
+
+    @staticmethod
+    async def generate_content(title: str, text: str, subject: str) -> dict:
+        content = {'title': title,
+                   'text': text,
+                   'subject': subject}
+        return content
 
 
 def get_db(

@@ -1,7 +1,7 @@
 """Description of notification models."""
 
 from enum import Enum
-from typing import Dict
+from typing import List
 
 from pydantic import BaseModel
 
@@ -21,7 +21,7 @@ class EventType(str, Enum):
 class Event(BaseModel):
     source: Source
     event_type: EventType
-    payload: Dict
+    payload: List
 
 
 class EventSent(BaseModel):

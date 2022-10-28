@@ -1,5 +1,4 @@
 import abc
-from typing import Dict
 
 from pika import BasicProperties
 from pika import BlockingConnection
@@ -14,10 +13,9 @@ class AbstractQueue(abc.ABC):
 
     @abc.abstractmethod
     async def send_msg(
-            self, title: str, text: str,
-            subject: str, receivers: list[str],  # type: ignore
+            self, content: dict, receivers: list[str],  # type: ignore
             delay: str,
-    ) -> EventSent:  # type: ignore
+    ) -> EventSent:
         pass
 
 
@@ -31,8 +29,12 @@ class QueueRabbit(AbstractQueue):
         # An exchange on one side receives messages from producers
         # and the other side it pushes them to queues.
         # The exchange must know exactly what to do with a message it receives.
+
+        # Auto-delete (queue that has had at least one consumer is deleted
+        # when last consumer unsubscribes)
         self.channel.queue_declare(
-            queue=rabbitmq_settings.RABBITMQ_QUEUE_NAME, durable=True,
+            queue=rabbitmq_settings.RABBITMQ_QUEUE_NAME,
+            durable=True, auto_delete=True,
         )
 
         self.channel.queue_bind(
@@ -53,12 +55,11 @@ class QueueRabbit(AbstractQueue):
             })
 
     async def send_msg(
-            self, title: str, text: str,
-            subject: str, receivers: list[str],  # type: ignore
+            self, content: dict, receivers: list[str],  # type: ignore
             delay: str,
     ) -> EventSent:
         event = await self.generate_event(
-            title, text, subject, receivers,
+            content, receivers,
         )
         msg_properties = BasicProperties(expiration=delay)  # Delay until the message is transferred in milliseconds.
         self.channel.basic_publish(exchange='',
@@ -69,13 +70,12 @@ class QueueRabbit(AbstractQueue):
         return EventSent(event_sent=True)
 
     async def generate_event(
-            self, title: str, text: str,
-            subject: str, receivers: list[str],  # type: ignore
+            self, content: dict, receivers: list[str],  # type: ignore
     ) -> Event:
         source = Source.email
-        event_type = EventType.mailing_list
+        event_type = EventType.mailing_list  # type: ignore
         payload = await self.generate_payload(
-            title, text, subject, receivers)
+            content, receivers)
         return Event(source=source,
                      event_type=event_type,
                      payload=payload,
@@ -83,23 +83,7 @@ class QueueRabbit(AbstractQueue):
 
     @staticmethod
     async def generate_payload(
-            title: str, text: str,
-            subject: str, receivers: list[str]) -> Dict:  # type: ignore
-        # payload - {users:
-        #               [{user : {user_id : user_id_1,
-        #                         name: login,
-        #                         email: email},
-        #                 content: {user_id: user_id}   # noqa: E800
-        #                   },
-        #               ]}   # noqa: E800
-        users_list = []
-        for user_id in receivers:
-            user = {'user_id': user_id}
-            content = {'title': title,
-                       'text': text,
-                       'subject': subject}
-            users_list.append({'user': user,
-                               'content': content})
-
-        payload = {'users': users_list}
+            content: dict, receivers: list[str]) -> list:  # type: ignore
+        payload = [{'users': receivers,
+                   'content': content}]
         return payload

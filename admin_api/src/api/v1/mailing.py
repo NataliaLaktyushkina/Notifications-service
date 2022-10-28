@@ -21,6 +21,7 @@ async def create_mailing(
         service: QueueHandler = Depends(get_db),
 ) -> EventSent:
     """Send letters to users."""
+    content = await service.generate_content(title, text, subject)
     return await service.send_notification(
-        title, text, subject, receivers, scheduled_time,
+        content, receivers, scheduled_time,
     )

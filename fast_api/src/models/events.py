@@ -2,7 +2,7 @@
 
 from datetime import datetime
 from enum import Enum
-from typing import Dict
+from typing import List
 
 from pydantic import BaseModel
 
@@ -22,7 +22,7 @@ class Event(BaseModel):
     source: Source
     event_type: EventType
     scheduled_datetime: datetime
-    payload: Dict
+    payload: List
 
 
 class EventSent(BaseModel):
