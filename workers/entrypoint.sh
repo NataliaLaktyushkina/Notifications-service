@@ -8,4 +8,4 @@ done
 
 echo "Rabbit mq started"
 
-python /app/consumers/consumer.py main
+python /app/consumers/consumer.py  asyncio run main
