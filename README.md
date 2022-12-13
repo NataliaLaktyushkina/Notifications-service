@@ -1,6 +1,4 @@
-# Проектная работа 10 спринта
-
-[Репозиторий notifications_sprint_1 (проектная работа 10-го спринта)](https://github.com/NataliaLaktyushkina/notifications_sprint_1)
+Service allow to send email message after user registration and create a new email with user's text.
 
 **Схема сервиса:**
 
